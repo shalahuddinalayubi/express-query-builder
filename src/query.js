@@ -1,4 +1,5 @@
 const AllowedFilter = require('./allowed-filter.js');
+const Sort = require('./sort.js');
 const QueryRequest = require('./query-request');
 
 function Query () {
@@ -8,10 +9,18 @@ function Query () {
 
     var _allowedFilters = []
 
+    /**
+     * The requested sort query.
+     * 
+     * @var Array
+     */
+    var _requestedSorts = []
+
     this.build = function (Subject, Request) {
         _Subject = Subject;
         _Request = new QueryRequest(Request);
         _allowedFilters = Array();
+        _requestedSorts = Array();
 
         return this;
     }
@@ -31,6 +40,43 @@ function Query () {
     var _buildQuery = function () {
         _allowedFilters.forEach(function (filter) {
             filter.build(_Subject);
+        });
+    }
+
+    /**
+     * Build sort query based on requested.
+     * 
+     * @param {*} sorts 
+     * @returns this
+     */
+    this.allowedSort = function (sorts) {
+        if (!Array.isArray(sorts)) {
+            throw new Error('Sorts must be an array');
+        }
+
+        // First get all sort query requested
+        // compare each with the sorts if match add.
+        _Request.getQuerySortRequested()
+                .forEach(function (sort) {
+                    if (sorts.includes(sort.replace('-', ''))) {
+                        var order = sort.includes('-') ? 'DESC' : 'ASC';
+                        _requestedSorts.push(new Sort(sort.replace('-', ''), order, _Request));
+                    }
+                });
+
+        _buildSortQuery();
+
+        return this;
+    }
+
+    /**
+     * Build the requested sort query.
+     * 
+     * @returns void
+     */
+    var _buildSortQuery = function () {
+        _requestedSorts.forEach(function (sort) {
+            sort.build(_Subject);
         });
     }
 
