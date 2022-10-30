@@ -1,4 +1,4 @@
-const AllowedFilter = require('./allowed-filter.js');
+const Filter = require('./filter.js');
 const QueryRequest = require('./query-request');
 
 function Query () {
@@ -6,30 +6,50 @@ function Query () {
 
     var _Request = { }
 
-    var _allowedFilters = []
+    /**
+     * List of requested filter names.
+     * 
+     * @var Array
+     */
+    var _requestedFilters = []
 
     this.build = function (Subject, Request) {
         _Subject = Subject;
         _Request = new QueryRequest(Request);
-        _allowedFilters = Array();
+        _requestedFilters = Array();
 
         return this;
     }
 
+    /**
+     * Define filter for requested client.
+     * 
+     * @param Array filters 
+     * @returns this
+     */
     this.allowedFillter = function (filters) {
-        if (Array.isArray(filters)) {
-            filters.forEach(function (filter) {
-                _allowedFilters.push(new AllowedFilter(filter, _Request));
-            });
-        };
+        if (!Array.isArray(filters)) {
+            throw new Error('Filters must an array');
+        }
 
-        _buildQuery();
+        for (const key in _Request.getFilter()) {
+            if (filters.includes(key)) {
+                _requestedFilters.push(new Filter(key, _Request));
+            }
+        }
+
+        _buildQueryFilter();
 
         return this;
     }
 
-    var _buildQuery = function () {
-        _allowedFilters.forEach(function (filter) {
+    /**
+     * Build query filter.
+     * 
+     * @return void
+     */
+    var _buildQueryFilter = function () {
+        _requestedFilters.forEach(function (filter) {
             filter.build(_Subject);
         });
     }
