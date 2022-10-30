@@ -56,7 +56,7 @@ function Query () {
 
         // First get all sort query requested
         // compare each with the sorts if match add.
-        _Request.getQuerySortRequested()
+        _Request.getSort()
                 .forEach(function (sort) {
                     if (sorts.includes(sort.replace('-', ''))) {
                         var order = sort.includes('-') ? 'DESC' : 'ASC';
@@ -64,7 +64,7 @@ function Query () {
                     }
                 });
 
-        _buildSortQuery();
+        _buildQuerySort();
 
         return this;
     }
@@ -74,7 +74,7 @@ function Query () {
      * 
      * @returns void
      */
-    var _buildSortQuery = function () {
+    var _buildQuerySort = function () {
         _requestedSorts.forEach(function (sort) {
             sort.build(_Subject);
         });
