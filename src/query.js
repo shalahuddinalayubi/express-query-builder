@@ -1,6 +1,7 @@
 const Filter = require('./filter.js');
 const Sort = require('./sort.js');
 const QueryRequest = require('./query-request');
+const OffsetPaginator = require('./Pagination/offset-paginator.js');
 
 function Query () {
     var _Subject = { }
@@ -98,6 +99,31 @@ function Query () {
         _requestedSorts.forEach(function (sort) {
             sort.build(_Subject);
         });
+    }
+
+    /**
+     * Paginate the query.
+     * 
+     * @returns 
+     */
+    this.paginate = function () {
+
+        if (_Request.hasPage()) {
+            var size = _Request.getPage().size;
+            var number = _Request.getPage().number;
+            var offset = (number - 1) * size;
+            
+            promises = [];
+            promises.push(_Subject.clone().clearSelect().clearOrder().count('* as total').first());
+            promises.push(_Subject.offset(offset).limit(size));
+            
+            return Promise.all(promises)
+                        .then(([countQuery, result]) => {
+                            return new OffsetPaginator(result, countQuery.total, size, number);
+                        });
+        }
+
+        return _Subject;
     }
 
     this.getQuery = function () {

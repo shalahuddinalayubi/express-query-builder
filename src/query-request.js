@@ -40,6 +40,26 @@ function QueryRequest (Request) {
     this.hasQuerySort = function () {
         return _Request.query.sort ? true : false;
     }
+
+    /**
+     * Get page query.
+     * 
+     * @returns Object
+     */
+    this.getPage = function () {
+        return this.hasPage()
+                ? _Request.query.page
+                : {};
+    }
+
+    /**
+     * Determine the request has query page.
+     * 
+     * @returns Boolean
+     */
+    this.hasPage = function () {
+        return _Request.query.page ? true : false;
+    }
 }
 
 module.exports = QueryRequest;
