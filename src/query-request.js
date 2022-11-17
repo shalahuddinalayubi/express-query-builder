@@ -1,14 +1,15 @@
 function QueryRequest (Request) {
-    var _Request = Request
+
+    var req = Object.create(Request);
 
     /**
      * Get query filter.
      * 
      * @returns Object
      */
-    this.getFilter = function () {
+    req.getFilter = function () {
         return this.hasQueryFilter
-                    ? _Request.query.filter
+                    ? this.query.filter
                     : {};
     }
 
@@ -17,8 +18,8 @@ function QueryRequest (Request) {
      * 
      * @returns Boolean
      */
-    this.hasQueryFilter = function () {
-        return _Request.query.filter ? true : false;
+     req.hasQueryFilter = function () {
+        return this.query.filter ? true : false;
     }
 
     /**
@@ -26,9 +27,9 @@ function QueryRequest (Request) {
      * 
      * @returns Array
      */
-    this.getSort = function () {
+     req.getSort = function () {
         return this.hasQuerySort()
-                ? _Request.query.sort.split(',')
+                ? this.query.sort.split(',')
                 : [];
     }
 
@@ -37,9 +38,11 @@ function QueryRequest (Request) {
      * 
      * @returns Boolean
      */
-    this.hasQuerySort = function () {
-        return _Request.query.sort ? true : false;
+     req.hasQuerySort = function () {
+        return this.query.sort ? true : false;
     }
+
+    return req;
 }
 
 module.exports = QueryRequest;
